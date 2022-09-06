@@ -9,7 +9,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val giphyListFragment = GiphyListFragment()
-        FragmentUtil.replaceFragment(giphyListFragment, supportFragmentManager)
+        FragmentUtil.replaceFragment(GiphyListFragment.newInstance(), supportFragmentManager)
     }
 }

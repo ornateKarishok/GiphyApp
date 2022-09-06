@@ -5,6 +5,9 @@ plugins {
 
 android {
     compileSdk 32
+    buildFeatures {
+        viewBinding = true
+    }
 
     defaultConfig {
         applicationId "com.mycompany.giphyapp"
@@ -47,4 +50,11 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+
+    implementation 'com.android.volley:volley:1.2.1'
+
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
 }
