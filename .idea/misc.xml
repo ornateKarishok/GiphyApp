@@ -3,10 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.1" />
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout-land/fragment_full_screen.xml" value="0.17195767195767195" />
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout-land/full_screen_item.xml" value="0.17195767195767195" />
         <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout-port/giph_item.xml" value="0.17074275362318841" />
         <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout/activity_main.xml" value="0.17074275362318841" />
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout/delete_menu.xml" value="0.17074275362318841" />
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout/fragment_full_screen.xml" value="0.1" />
         <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout/fragment_giph_list.xml" value="0.17074275362318841" />
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout/full_screen_item.xml" value="0.1" />
         <entry key="..\:/root/Android/GiphyApp/app/src/main/res/layout/giph_item.xml" value="0.2384428223844282" />
+        <entry key="..\:/root/Android/GiphyApp/app/src/main/res/menu/delete_menu.xml" value="0.20416666666666666" />
       </map>
     </option>
   </component>

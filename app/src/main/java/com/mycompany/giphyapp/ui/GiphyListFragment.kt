@@ -1,15 +1,24 @@
 package com.mycompany.giphyapp.ui
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.ContextMenu.ContextMenuInfo
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.mycompany.giphyapp.api.*
-import com.mycompany.giphyapp.databinding.FragmentGiphListBinding
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.mycompany.giphyapp.R
+import com.mycompany.giphyapp.api.GiphyRepository
+import com.mycompany.giphyapp.api.GiphyViewModel
+import com.mycompany.giphyapp.api.GiphyViewModelFactory
+import com.mycompany.giphyapp.api.RetrofitService
+import com.mycompany.giphyapp.batabase.ImageViewModel
+import com.mycompany.giphyapp.batabase.entities.Image
+import com.mycompany.giphyapp.models.DataObject
+import com.mycompany.giphyapp.util.FragmentUtil
 
 
 class GiphyListFragment : Fragment() {
@@ -17,9 +26,10 @@ class GiphyListFragment : Fragment() {
         fun newInstance() = GiphyListFragment()
     }
 
-    private lateinit var viewModel: GiphyViewModel
-    private lateinit var binding: FragmentGiphListBinding
+    private lateinit var retrofitViewModel: GiphyViewModel
+    private lateinit var databaseViewModel: ImageViewModel
     private val retrofitService = RetrofitService.getInstance()
+    var giphs: List<Image> = mutableListOf()
     lateinit var mContext: Context
 
     override fun onCreateView(
@@ -28,25 +38,53 @@ class GiphyListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view =
-            inflater.inflate(com.mycompany.giphyapp.R.layout.fragment_giph_list, container, false)
-        binding =
-            FragmentGiphListBinding.inflate(inflater, container, false)
+            inflater.inflate(R.layout.fragment_giph_list, container, false)
 
-        viewModel =
-            ViewModelProvider(this, GiphyViewModelFactory(GiphyRepository(retrofitService))).get(
-                GiphyViewModel::class.java
-            )
+
         val adapter = GiphyListAdapter(mContext)
-        binding.recyclerView.adapter = adapter
-        viewModel.giphyList.observe(viewLifecycleOwner) {
-            adapter.setGiphList(it.res)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        databaseViewModel = ViewModelProvider(this)[ImageViewModel::class.java]
+        databaseViewModel.readAllData.observe(viewLifecycleOwner, Observer { image ->
+            giphs = image
+            adapter.setData(image)
+        })
+        if (giphs.isEmpty()) {
+            retrofitViewModel =
+                ViewModelProvider(
+                    this,
+                    GiphyViewModelFactory(GiphyRepository(retrofitService))
+                ).get(
+                    GiphyViewModel::class.java
+                )
+            retrofitViewModel.giphyList.observe(viewLifecycleOwner) {
+                insertDataToDatabase(it.res)
+            }
+
+            retrofitViewModel.errorMessage.observe(viewLifecycleOwner) {
+            }
+            retrofitViewModel.getGiphyList()
         }
-        viewModel.errorMessage.observe(viewLifecycleOwner) {
-        }
-        viewModel.getGiphyList()
-//        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-//        val adapter = GiphyListAdapter(this, gifs)
+
+        recyclerView.adapter = adapter
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = GridLayoutManager(mContext, 2)
+        adapter.setOnClickListener(object : GiphyListAdapter.OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                FragmentUtil.replaceFragment(
+                    FullScreenFragment.newInstance(giphs, position),
+                    parentFragmentManager
+                )
+            }
+        })
+
         return view
+    }
+
+    private fun insertDataToDatabase(res: List<DataObject>) {
+        for (i in res.indices) {
+            val image = Image(res[i].images.ogImages.url, res[i].name)
+            databaseViewModel.addImage(image)
+        }
     }
 
     override fun onAttach(context: Context) {

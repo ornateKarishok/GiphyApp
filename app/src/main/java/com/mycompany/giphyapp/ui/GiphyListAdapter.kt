@@ -2,29 +2,48 @@ package com.mycompany.giphyapp.ui
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ExpandableListView
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.mycompany.giphyapp.R
+import com.mycompany.giphyapp.batabase.entities.Image
 import com.mycompany.giphyapp.databinding.GiphItemBinding
 import com.mycompany.giphyapp.models.DataObject
 
-class GiphyListAdapter(val context : Context) : RecyclerView.Adapter<MainViewHolder>() {
-    var giphs = mutableListOf<DataObject>()
-    fun setGiphList(companies: List<DataObject>) {
-        this.giphs = companies.toMutableList()
+class GiphyListAdapter(val context: Context) :
+    RecyclerView.Adapter<GiphyListAdapter.MainViewHolder>() {
+    lateinit var clickListener: OnItemClickListener
+
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    fun setOnClickListener(listener: OnItemClickListener) {
+        clickListener = listener
+    }
+
+    var giphs = emptyList<Image>()
+
+    fun setData(image: List<Image>) {
+        this.giphs = image
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = GiphItemBinding.inflate(inflater, parent, false)
-        return MainViewHolder(binding)
+        return MainViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.giph_item, parent, false),
+            clickListener
+        )
     }
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         val giph = giphs[position]
-        Glide.with(context).load(giph.images.ogImages.url)
-            .into(holder.binding.imageViewGiph)
+        Glide.with(context).load(giph.url)
+            .into(holder.imageView)
 
     }
 
@@ -32,8 +51,19 @@ class GiphyListAdapter(val context : Context) : RecyclerView.Adapter<MainViewHol
         return giphs.size
     }
 
+    class MainViewHolder(itemView: View, listener: OnItemClickListener) :
+        RecyclerView.ViewHolder(itemView) {
+        val imageView = itemView.findViewById<ImageView>(R.id.imageViewGiph)
+
+        init {
+            itemView.setOnClickListener {
+
+                listener.onItemClick(adapterPosition)
+            }
+
+        }
+    }
 }
 
-class MainViewHolder(val binding: GiphItemBinding) : RecyclerView.ViewHolder(binding.root) {
-}
+
 
