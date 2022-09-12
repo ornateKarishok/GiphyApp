@@ -14,6 +14,7 @@ abstract class ImageDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: ImageDatabase? = null
+        private const val DATABASE_NAME = "image_database"
 
         fun getDatabase(context: Context): ImageDatabase {
             val tempInstance = INSTANCE
@@ -24,7 +25,7 @@ abstract class ImageDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ImageDatabase::class.java,
-                    "image_database"
+                    DATABASE_NAME
                 ).build()
                 INSTANCE = instance
                 return instance

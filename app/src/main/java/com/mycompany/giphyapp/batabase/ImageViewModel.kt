@@ -1,17 +1,14 @@
 package com.mycompany.giphyapp.batabase
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.mycompany.giphyapp.batabase.entities.Image
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ImageViewModel(application: Application) : AndroidViewModel(application) {
     val readAllData: LiveData<List<Image>>
-    private val repository : ImageRepository
+    private val repository: ImageRepository
 
     init {
         val imageDao = ImageDatabase.getDatabase(application).imageDao()
@@ -19,14 +16,19 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
         readAllData = repository.readAllData
     }
 
-    fun addImage(image: Image){
+    fun addImage(image: Image) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addImage(image)
         }
     }
-    fun deleteGif(gif: Image){
+
+    fun deleteGif(gif: Image) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteImage(gif)
         }
+    }
+
+    fun searchDatabase(searchQuery: String): LiveData<List<Image>> {
+        return repository.searchDatabase(searchQuery).asLiveData()
     }
 }

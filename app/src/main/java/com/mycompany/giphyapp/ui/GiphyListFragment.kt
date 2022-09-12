@@ -1,12 +1,12 @@
 package com.mycompany.giphyapp.ui
 
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import android.view.*
-import android.view.ContextMenu.ContextMenuInfo
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,8 +29,11 @@ class GiphyListFragment : Fragment() {
     private lateinit var retrofitViewModel: GiphyViewModel
     private lateinit var databaseViewModel: ImageViewModel
     private val retrofitService = RetrofitService.getInstance()
-    var giphs: List<Image> = mutableListOf()
-    lateinit var mContext: Context
+    var gifs: List<Image> = mutableListOf()
+    private lateinit var mContext: Context
+    private lateinit var searchView: SearchView
+    private lateinit var recyclerView: RecyclerView
+    private val adapter by lazy { GiphyListAdapter(mContext) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,22 +43,18 @@ class GiphyListFragment : Fragment() {
         val view =
             inflater.inflate(R.layout.fragment_giph_list, container, false)
 
-
-        val adapter = GiphyListAdapter(mContext)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView = view.findViewById(R.id.recyclerView)
         databaseViewModel = ViewModelProvider(this)[ImageViewModel::class.java]
-        databaseViewModel.readAllData.observe(viewLifecycleOwner, Observer { image ->
-            giphs = image
-            adapter.setData(image)
-        })
-        if (giphs.isEmpty()) {
+        databaseViewModel.readAllData.observe(viewLifecycleOwner) { image ->
+            gifs = image
+            adapter.setData(gifs)
+        }
+        if (gifs.isEmpty()) {
             retrofitViewModel =
                 ViewModelProvider(
                     this,
                     GiphyViewModelFactory(GiphyRepository(retrofitService))
-                ).get(
-                    GiphyViewModel::class.java
-                )
+                )[GiphyViewModel::class.java]
             retrofitViewModel.giphyList.observe(viewLifecycleOwner) {
                 insertDataToDatabase(it.res)
             }
@@ -71,12 +70,23 @@ class GiphyListFragment : Fragment() {
         adapter.setOnClickListener(object : GiphyListAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
                 FragmentUtil.replaceFragment(
-                    FullScreenFragment.newInstance(giphs, position),
+                    FullScreenFragment.newInstance(gifs, position),
                     parentFragmentManager
                 )
             }
         })
 
+        searchView = view.findViewById(R.id.search)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                searchDatabase(newText)
+                return true
+            }
+        })
         return view
     }
 
@@ -87,10 +97,18 @@ class GiphyListFragment : Fragment() {
         }
     }
 
+    private fun searchDatabase(query: String) {
+        val searchQuery = "%$query%"
+
+        databaseViewModel.searchDatabase(searchQuery).observe(this) { list ->
+            list.let {
+                adapter.setData(it)
+            }
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
     }
-
-
 }

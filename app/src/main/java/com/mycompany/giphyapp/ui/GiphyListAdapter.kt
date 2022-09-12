@@ -4,19 +4,16 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ExpandableListView
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mycompany.giphyapp.R
 import com.mycompany.giphyapp.batabase.entities.Image
-import com.mycompany.giphyapp.databinding.GiphItemBinding
-import com.mycompany.giphyapp.models.DataObject
 
-class GiphyListAdapter(val context: Context) :
+class GiphyListAdapter(private val context: Context) :
     RecyclerView.Adapter<GiphyListAdapter.MainViewHolder>() {
-    lateinit var clickListener: OnItemClickListener
+    private lateinit var clickListener: OnItemClickListener
+    private var gifs = emptyList<Image>()
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
@@ -26,10 +23,8 @@ class GiphyListAdapter(val context: Context) :
         clickListener = listener
     }
 
-    var giphs = emptyList<Image>()
-
     fun setData(image: List<Image>) {
-        this.giphs = image
+        this.gifs = image
         notifyDataSetChanged()
     }
 
@@ -41,19 +36,18 @@ class GiphyListAdapter(val context: Context) :
     }
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        val giph = giphs[position]
-        Glide.with(context).load(giph.url)
+        val gif = gifs[position]
+        Glide.with(context).load(gif.url)
             .into(holder.imageView)
-
     }
 
     override fun getItemCount(): Int {
-        return giphs.size
+        return gifs.size
     }
 
     class MainViewHolder(itemView: View, listener: OnItemClickListener) :
         RecyclerView.ViewHolder(itemView) {
-        val imageView = itemView.findViewById<ImageView>(R.id.imageViewGiph)
+        val imageView = itemView.findViewById<ImageView>(R.id.imageViewGiph)!!
 
         init {
             itemView.setOnClickListener {

@@ -17,16 +17,16 @@ import com.mycompany.giphyapp.util.FragmentUtil
 class FullScreenFragment : Fragment() {
     private lateinit var viewPager: ViewPager
     private lateinit var viewPagerAdapter: ViewPagerAdapter
-    private lateinit var giphsList: ArrayList<Image>
+    private lateinit var gifsList: ArrayList<Image>
     private lateinit var databaseViewModel: ImageViewModel
     private var position: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            val giphsListarg = arguments?.getParcelableArrayList<Image>("list")
-            if (giphsListarg != null) {
-                giphsList = giphsListarg
+            val gifsListArgs = arguments?.getParcelableArrayList<Image>("list")
+            if (gifsListArgs != null) {
+                gifsList = gifsListArgs
             }
             position = arguments?.getInt("position")!!
         }
@@ -38,11 +38,11 @@ class FullScreenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_full_screen, container, false)
-        databaseViewModel = ViewModelProvider(this).get(ImageViewModel::class.java)
+        databaseViewModel = ViewModelProvider(this)[ImageViewModel::class.java]
         viewPager = view.findViewById(R.id.viewPager)
-        viewPagerAdapter = ViewPagerAdapter(requireContext(), giphsList)
+        viewPagerAdapter = ViewPagerAdapter(requireContext(), gifsList)
 
-        viewPager.offscreenPageLimit = giphsList.size
+        viewPager.offscreenPageLimit = gifsList.size
         viewPager.adapter = viewPagerAdapter
         viewPager.currentItem = position
         setHasOptionsMenu(true)
@@ -75,8 +75,8 @@ class FullScreenFragment : Fragment() {
     private fun deleteImage() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes") { _, _ ->
-            databaseViewModel.deleteGif(giphsList[viewPager.currentItem])
-            giphsList.removeAt(viewPager.currentItem)
+            databaseViewModel.deleteGif(gifsList[viewPager.currentItem])
+            gifsList.removeAt(viewPager.currentItem)
             viewPagerAdapter.notifyDataSetChanged()
             FragmentUtil.replaceFragment(GiphyListFragment.newInstance(), parentFragmentManager)
         }

@@ -11,12 +11,13 @@ interface RetrofitService {
     fun getGifs(): Call<DataResult>
 
     companion object {
-        var retrofitService: RetrofitService? = null
+        private const val BASE_URL = "https://api.giphy.com/v1/"
+        private var retrofitService: RetrofitService? = null
 
         fun getInstance() : RetrofitService {
             if (retrofitService == null) {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("https://api.giphy.com/v1/")
+                    .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 retrofitService = retrofit.create(RetrofitService::class.java)

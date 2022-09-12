@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.IGNORE
 import androidx.room.Query
 import com.mycompany.giphyapp.batabase.entities.Image
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ImageDao {
@@ -18,4 +19,7 @@ interface ImageDao {
 
     @Query("SELECT * FROM IMAGES")
     fun readAllImages() : LiveData<List<Image>>
+
+    @Query("SELECT * FROM IMAGES WHERE name LIKE :name")
+    fun getImageByName(name: String): Flow<List<Image>>
 }

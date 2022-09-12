@@ -12,16 +12,6 @@ data class Image(
     val name: String
 ) : Parcelable {
     constructor(source: Parcel) : this(source.readString().toString(), source.readString().toString())
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeString(this.url)
-        dest?.writeString(this.name)
-    }
-
     companion object {
         @JvmField
         final val CREATOR: Parcelable.Creator<Image> = object : Parcelable.Creator<Image> {
@@ -33,5 +23,14 @@ data class Image(
                 return arrayOfNulls(size)
             }
         }
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun writeToParcel(dest: Parcel?, flags: Int) {
+        dest?.writeString(this.url)
+        dest?.writeString(this.name)
     }
 }
